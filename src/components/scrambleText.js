@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 
-
 function ScrambleText(props) {
     const text = props.text?? props.children;
     const delay = props.delay?? 0;
@@ -13,7 +12,6 @@ function ScrambleText(props) {
     const [shownWord, setShownWord] = useState('');
     const [onScrambled, setOnScrambled] = useState(false);
 
-
     useEffect(() => {
         scramble();
     }, [])
@@ -24,9 +22,14 @@ function ScrambleText(props) {
         } else {
             return;
         }
+
+        const letters = '1234567890qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM';
         let word = text;
-        let letters = '1234567890qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM';
         let curCorrectLetter = -1;
+        let curAppearedLetter = -1;
+        if (appearAll) {
+            curAppearedLetter = word.length;
+        }
         
         await sleep(delay);
         
@@ -37,12 +40,20 @@ function ScrambleText(props) {
                 curCorrectLetter++;
             }
 
+            if (i >= scrambledTimes/2) {
+                curAppearedLetter++;
+            }
+
             for (let l = 0; l < word.length; l++) {
                 let random = letters[Math.floor(Math.random() * letters.length)];
                 let color = secondaryColor;
                 let opacity = 1;
                 if (!appearAll) {
                     opacity = 0;
+                }
+
+                if (curAppearedLetter >= l) {
+                    opacity = 1;
                 }
 
                 if (word[l] == " " || word[l] == "-") {
@@ -61,7 +72,7 @@ function ScrambleText(props) {
             await sleep(30);
         }
 
-        setShownWord(word);
+        setShownWord([<span style={{color: primaryColor}}>{word}</span>]);
         setOnScrambled(false);
     }
 
